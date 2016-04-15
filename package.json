@@ -1,0 +1,23 @@
+{
+  "name": "cerebral-cli",
+  "version": "1.0.0",
+  "description": "Command line tool for cerebral app development.",
+  "main": "index.js",
+  "scripts": {
+    "start": "kotatsu start index.js --es2015",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/cerebral/cerebral-cli"
+  },
+  "keywords": [
+    "cerebral",
+    "cli"
+  ],
+  "author": "Brian Fitch",
+  "license": "MIT",
+  "devDependencies": {
+    "kotatsu": "^0.13.0"
+  }
+}
