@@ -3,8 +3,11 @@
   "version": "1.0.0",
   "description": "Command line tool for cerebral app development.",
   "main": "index.js",
+  "bin": {
+    "cerebral-cli": "./cli.js"
+  },
   "scripts": {
-    "start": "kotatsu start index.js --es2015",
+    "start": "kotatsu start cli.js --es2015",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -19,5 +22,9 @@
   "license": "MIT",
   "devDependencies": {
     "kotatsu": "^0.13.0"
+  },
+  "dependencies": {
+    "fs-extra": "^0.27.0",
+    "yargs": "^4.6.0"
   }
 }
