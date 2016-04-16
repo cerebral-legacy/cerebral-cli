@@ -1,6 +1,6 @@
 {
   "name": "cerebral-cli",
-  "version": "1.0.0",
+  "version": "0.0.1",
   "description": "Command line tool for cerebral app development.",
   "main": "index.js",
   "bin": {
