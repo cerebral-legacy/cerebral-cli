@@ -48,7 +48,7 @@ argv
 const ARGV    = argv.argv;
 const command = ARGV._[0];
 const options = {
-  appName: ARGV._[0],
+  appName: ARGV._[1],
   port: ARGV.port,
   index: ARGV.index,
   config: ARGV.config
