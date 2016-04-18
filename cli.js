@@ -45,7 +45,13 @@ argv
   .alias('h', 'help')
   .argv;
 
-const command = argv.argv._[0];
-const appName = argv.argv._[1];
+const ARGV    = argv.argv;
+const command = ARGV._[0];
+const options = {
+  appName: ARGV._[0],
+  port: ARGV.port,
+  index: ARGV.index,
+  config: ARGV.config
+};
 
-cli[command](appName);
+cli[command](options);

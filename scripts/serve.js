@@ -1,11 +1,28 @@
 const CWD = process.cwd();
-var exec = require('child_process').exec;
+var spawn = require('child_process').spawnSync;
 // const pkg   = require('./package.json');
 
-module.exports = function serve(appName, args) {
-  exec(`kotatsu serve app/main.js --port 3007`, function (error, stdout, stderr) {
-    if (error) return console.error(error);
-    console.log(stdout);
-    console.log(stderr);
-  });
+module.exports = function serve(options) {
+  const ALLOWED_OPTIONS = ['index', 'config', 'devtool', 'port']
+  var defaults = {
+    '--index': 'app/index.html',
+    '--config': 'webpack.config.js',
+    '--devtool': 'eval-source-map',
+    '--port': '3000'
+  }
+  var userOpts = ALLOWED_OPTIONS
+    .reduce((opts, opt) => {
+      if (options[opt]) opts[`--${opt}`] = options[opt];
+      return opts;
+    },{});
+  var mergedOpts = Object.assign({}, defaults, userOpts);
+  var cliOpts    = Object.keys(mergedOpts).reduce((opts,opt) => {
+    return opts.concat([`${opt}`, mergedOpts[opt]]);
+  },[]);
+
+  spawn(
+    'kotatsu',
+    ['serve', 'app/main.js'].concat(cliOpts),
+    {stdio: 'inherit'}
+  );
 }
