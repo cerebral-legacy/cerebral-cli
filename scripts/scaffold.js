@@ -10,8 +10,8 @@ module.exports = function scaffold(options) {
     if (err) return console.error(err)
   });
 
-  var stdout = exec("npm bin",{stdio:[0]});
-  const cliDirectory = `${stdout.toString('utf8').split('/.bin')[0]}/cerebral-cli`;
+  var stdout = exec("npm root -g", {stdio:[0]});
+  const cliDirectory = `${stdout.toString()}/cerebral-cli`;
 
   fs.copySync(`${cliDirectory}/scaffold`, `${CWD}/${appName}`);
   console.log(`\n* Scaffolding new Cerebral application:\n`);
