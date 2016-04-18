@@ -1,5 +1,5 @@
 {
-  "name": "your-app-name",
+  "name": "",
   "version": "0.0.1",
   "description": "",
   "main": "main.js",
@@ -20,13 +20,10 @@
     "build": ""
   },
   "dependencies": {
-    "baobab": "^2.3.3",
     "cerebral": "^0.33.24",
     "cerebral-addons": "^0.4.9",
-    "cerebral-model-baobab": "^0.4.7",
     "cerebral-module-devtools": "^0.5.3",
     "cerebral-module-router": "^0.12.5",
-    "cerebral-view-react": "^0.11.6",
     "react": "^0.14.7",
     "react-dom": "^0.14.7"
   },
