@@ -5,7 +5,7 @@ var spawn = require('child_process').spawnSync;
 module.exports = function serve(options) {
   const ALLOWED_OPTIONS = ['index', 'config', 'devtool', 'port']
   var defaults = {
-    '--index': 'app/index.html',
+    '--index': 'index.html',
     '--config': 'webpack.config.js',
     '--devtool': 'eval-source-map',
     '--port': '3000'
@@ -22,7 +22,7 @@ module.exports = function serve(options) {
 
   spawn(
     'kotatsu',
-    ['serve', 'app/main.js'].concat(cliOpts),
+    ['serve', 'src/main.js'].concat(cliOpts),
     {stdio: 'inherit'}
   );
 }
