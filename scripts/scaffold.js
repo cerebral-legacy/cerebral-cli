@@ -29,17 +29,55 @@ module.exports = function scaffold(options) {
     var stdout = exec("npm root -g", {stdio:[0]});
     var cliDirectory = `${stdout.toString().split('\n')[0]}/cerebral-cli`;
 
-  //   fs.copySync(`${cliDirectory}/scaffold`, `${CWD}/${appName}`);
-  //   console.log(`\n* Scaffolding new Cerebral application:\n`);
-  //
-  //   stdout = exec(`find ${appName} -type d -print`, {stdio: [0]});
-  //   console.log(`${stdout.toString()}`);
-  //
-  //   process.chdir(appName);
-  //
-  //   stdout = exec('git init', {stdio: [0]});
-  //   console.log(`* ${stdout.toString()}`);
-  //
+    fs.copySync(`${cliDirectory}/scaffold`, `${CWD}/${appName}`);
+    console.log(`\n* Scaffolding new Cerebral application:\n`);
+
+    var viewValues = {
+      'React': {
+        viewImports: (
+          "import React from 'react';\n" +
+          "import ReactDOM from 'react-dom';\n" +
+          "import {Container} from 'cerebral-view-react';"
+        ),
+        initialRender: (
+          "ReactDOM.render(\n" +
+          "  <Container controller={controller}><ColorChanger/></Container>,\n" +
+          "  document.getElementById('root')\n" +
+          ");"
+        )
+      }
+    }
+    var modelValues = {
+      'Baobab': {
+        modelImports: (
+          "import Model from 'cerebral-model-baobab';"
+        )
+      }
+    }
+    var data = fs.readFileSync(`${cliDirectory}/_main.js`, 'utf8');
+
+    const tmpl = (template, values) => {
+      var tmp = template.replace('${VIEW_IMPORTS}', values.viewImports);
+      tmp = tmp.replace('${MODEL_IMPORTS}', values.modelImports);
+      tmp = tmp.replace('${INITIAL_RENDER}', values.initialRender);
+      return tmp;
+    }
+
+    var templateValues = Object.assign({},
+      viewValues[answers.view],
+      modelValues[answers.model]
+    );
+
+    fs.writeFileSync(`${CWD}/${appName}/app/main.js`, tmpl(data, templateValues));
+
+    stdout = exec(`find ${appName} -type d -print`, {stdio: [0]});
+    console.log(`${stdout.toString()}`);
+
+    process.chdir(appName);
+
+    stdout = exec('git init', {stdio: [0]});
+    console.log(`* ${stdout.toString()}`);
+
     pkg.name = dasherize(appName);
 
     var packages = {
@@ -63,10 +101,6 @@ module.exports = function scaffold(options) {
       }
     });
 
-    // Configue model and view imports in main.js
-    // maybe use _main.js as a 'template' and insert selected packages
-
-    // var data = fs.readFileSync(`${cliDirectory}/_main.js`, 'utf8');
     return;
 
     npm = spawn('npm', ['install'], {stdio: 'inherit'});
