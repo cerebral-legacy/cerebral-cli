@@ -3,7 +3,6 @@ const CWD       = process.cwd();
 var exec        = require('child_process').execSync;
 var spawn       = require('child_process').spawn;
 var inquirer    = require('inquirer');
-var pkg         = require('../scaffold/package.json');
 var httpGet     = require('./utils').httpGet;
 var dasherize   = require('./utils').dasherize;
 
@@ -21,6 +20,7 @@ module.exports = function scaffold(options) {
     message: 'What model layer you want to use?',
     choices: ['Baobab', 'ImmutableJS']
   }]).then(function(answers) {
+    var pkg = require(`../scaffold/${answers.view.toLowerCase()}/package.json`);
 
     fs.mkdirs(`${CWD}/${appName}`, function (err) {
       if (err) return console.error(err)
@@ -29,14 +29,12 @@ module.exports = function scaffold(options) {
     var stdout = exec("npm root -g", {stdio:[0]});
     var cliDirectory = `${stdout.toString().split('\n')[0]}/cerebral-cli`;
 
-    /*
-    fs.copySync(`${cliDirectory}/scaffold`, `${CWD}/${appName}`);
     console.log(`\n* Scaffolding new Cerebral application:\n`);
-    */
+
     fs.copySync(`${cliDirectory}/scaffold/index.html`, `${CWD}/${appName}/index.html`);
-    fs.copySync(`${cliDirectory}/scaffold/webpack.config.js`, `${CWD}/${appName}/webpack.config.js`);
+    fs.copySync(`${cliDirectory}/scaffold/${answers.view.toLowerCase()}/webpack.config.js`, `${CWD}/${appName}/webpack.config.js`);
     fs.copySync(`${cliDirectory}/scaffold/modules/basic`, `${CWD}/${appName}/src/modules/App`);
-    fs.copySync(`${cliDirectory}/scaffold/react/basic`, `${CWD}/${appName}/src`);
+    fs.copySync(`${cliDirectory}/scaffold/${answers.view.toLowerCase()}/basic`, `${CWD}/${appName}/src`);
 
     var packages = {
       // Views
@@ -70,22 +68,27 @@ module.exports = function scaffold(options) {
       httpGet('registry.npmjs.org', `/${packages[answers.view]}`),
       httpGet('registry.npmjs.org', `/${packages[answers.model]}`)
     ])
-      .then(function (packages) {
-        packages.forEach(function (npmPackage) {
-          pkg.dependencies[npmPackage.name] = npmPackage['dist-tags'].latest;
-        });
-        fs.writeFileSync(`${CWD}/${appName}/package.json`, JSON.stringify(pkg,null,2));
-      })
-      .then(function () {
-        npm = spawn('npm', ['install'], {stdio: 'inherit'});
-        console.log('* installing npm packages...\n');
+    .then(writeLatestPackages)
+    .then(function () {
+      npm = spawn('npm', ['install'], {stdio: 'inherit'});
+      console.log('* installing npm packages...\n');
 
-        npm.on('close', function(code) {
-          console.log('* All npm packages successfully installed!');
-          console.log(`\n---------------------------------------------------------------------------`);
-          console.log(`\n* SUCCESS: New application '${appName}' created at '${CWD}'.\n`);
-        });
+      npm.on('close', function(code) {
+        console.log('* All npm packages successfully installed!');
+        console.log(`\n---------------------------------------------------------------------------`);
+        console.log(`\n* SUCCESS: New application '${appName}' created at '${CWD}'.\n`);
       });
+    });
 
+    function writeLatestPackages(pkgs) {
+      pkgs.forEach(function(npmPackage) {
+        pkg.dependencies[npmPackage.name] = npmPackage['dist-tags'].latest;
+      });
+      const data = fs.writeFileSync(
+        `${CWD}/${appName}/package.json`,
+        JSON.stringify(pkg,null,2)
+      );
+      return Promise.resolve(data);
+    }
   });
 };
