@@ -2,7 +2,7 @@
   "name": "cerebral-cli",
   "version": "0.0.6",
   "description": "Command line tool for cerebral app development.",
-  "main": "index.js",
+  "preferGlobal": true,
   "bin": {
     "cerebral": "./cli.js"
   },
@@ -16,7 +16,8 @@
   },
   "keywords": [
     "cerebral",
-    "cli"
+    "cli",
+    "cerebral-cli"
   ],
   "author": "Brian Fitch",
   "license": "MIT",
