@@ -16,7 +16,7 @@ const argv = yargs
   .usage(USAGE)
   .demand(1)
   .check(function (argv) {
-    if (!~Object.keys(COMMANDS).indexOf(command)) {
+    if (Object.keys(COMMANDS).indexOf(command) === -1) {
       throw Error(
         `Invalid command: ${command}
         ${AVAILABLE_COMMANDS}`
@@ -26,7 +26,9 @@ const argv = yargs
   })
 
 Object.keys(COMMANDS).forEach(command => {
-  argv.command(command, COMMANDS[command])
+  argv.command(command, COMMANDS[command], function(argv) {
+    if (!argv.argv._[1]) throw new Error('You must provide an application name.')
+  })
 })
 
 argv
@@ -42,10 +44,7 @@ argv
 const ARGV = argv.argv
 const command = ARGV._[0]
 const options = {
-  appName: ARGV._[1],
-  port: ARGV.port,
-  index: ARGV.index,
-  config: ARGV.config
+  appName: ARGV._[1]
 }
 
 tasks[command](options)
