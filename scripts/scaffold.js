@@ -27,15 +27,9 @@ module.exports = function scaffold (options) {
       ]
     }])
     .then(function (answers) {
-      if (answers.main.indexOf('Change view') === 0) {
-        view()
-      }
-      if (answers.main.indexOf('Change model') === 0) {
-        model()
-      }
-      if (answers.main.indexOf('Change modules') === 0) {
-        modules()
-      }
+      if (answers.main.indexOf('Change view') === 0) { view() }
+      if (answers.main.indexOf('Change model') === 0) { model() }
+      if (answers.main.indexOf('Change modules') === 0) { modules() }
       if (answers.main.indexOf('Done') === 0 || answers.main.indexOf('Default') === 0) {
         scaffold()
       }
@@ -106,81 +100,107 @@ module.exports = function scaffold (options) {
       'Immutable': 'cerebral-model-immutable',
       'Mutable': 'cerebral-model',
       // Modules
-      'Devtools': 'cerebral-module-devtools',
-      'Router': 'cerebral-module-router',
-      'Http': 'cerebral-module-http',
-      'Useragent': 'cerebral-module-useragent'
+      modules: {
+        'Devtools': 'cerebral-module-devtools',
+        'Router': 'cerebral-module-router',
+        'Http': 'cerebral-module-http',
+        'Useragent': 'cerebral-module-useragent'
+      }
     }
 
     var pkg = require(`../scaffold/${currentView.toLowerCase()}/package.json`)
 
-    fs.mkdirs(`${CWD}/${appName}`, function (err) {
-      if (err) return console.error(err)
-    })
+    fs.mkdirsSync(`${CWD}/${appName}`)
 
     var stdout = exec('npm root -g', {stdio: [0]})
     var cliDirectory = `${stdout.toString().split('\n')[0]}/cerebral-cli`
 
     console.log(`\n* Scaffolding new Cerebral application with: ${currentView}, ${currentModel}, ${currentModules.join(', ')}:\n`)
 
-    // fs.copySync(`${cliDirectory}/scaffold/index.html`, `${CWD}/${appName}/index.html`)
-    // fs.copySync(`${cliDirectory}/scaffold/${answers.view.toLowerCase()}/webpack.config.js`, `${CWD}/${appName}/webpack.config.js`)
-    // fs.copySync(`${cliDirectory}/scaffold/modules/basic`, `${CWD}/${appName}/src/modules/App`)
-    // fs.copySync(`${cliDirectory}/scaffold/${answers.view.toLowerCase()}/basic`, `${CWD}/${appName}/src`)
-    //
-    // var controller = fs.readFileSync(`${cliDirectory}/scaffold/controller.js`, 'utf8')
-    // controller = controller.replace('{{MODEL}}', packages[answers.model])
-    // controller = controller.replace('{{MODULES}}', '')
-    //
-    // fs.writeFileSync(`${CWD}/${appName}/src/controller.js`, controller)
-    //
-    // stdout = exec(`find ${appName} -type d -print`, {stdio: [0]})
-    // console.log(`${stdout.toString()}`)
-    //
-    // process.chdir(appName)
-    //
-    // stdout = exec('git init', {stdio: [0]})
-    // console.log(`* ${stdout.toString()}`)
-    //
-    // pkg.name = dasherize(appName)
-    //
-    // Promise.all([
-    //   httpGet('registry.npmjs.org', `/${packages[answers.view]}`),
-    //   httpGet('registry.npmjs.org', `/${packages[answers.model]}`)
-    // ])
-    // .then(writeLatestPackages)
-    // .then(function () {
-    //   // var npm = spawn('npm', ['install'], {stdio: 'inherit'})
-    //   console.log('* installing npm packages...\n')
-    //
-    //   npm.on('close', function (code) {
-    //     console.log('* All npm packages successfully installed!')
-    //     console.log(`\n---------------------------------------------------------------------------`)
-    //     console.log(`\n* SUCCESS: New application '${appName}' created at '${CWD}'.\n`)
-    //   })
-    // })
-    //
-    // function writeLatestPackages (pkgs) {
-    //   pkgs.forEach(function (npmPackage) {
-    //     pkg.dependencies[npmPackage.name] = npmPackage['dist-tags'].latest
-    //   })
-    //   const data = fs.writeFileSync(
-    //     `${CWD}/${appName}/package.json`, JSON.stringify(pkg, null, 2)
-    //   )
-    //   return Promise.resolve(data)
-    // }
-  }
+    // copy scaffold files
+    fs.copySync(`${cliDirectory}/scaffold/${currentView.toLowerCase()}/main.js`, `${CWD}/${appName}/src/main.js`)
+    fs.copySync(`${cliDirectory}/scaffold/${currentView.toLowerCase()}/components`, `${CWD}/${appName}/src/components`)
 
-  // inquirer.prompt([{
-  //   type: 'list',
-  //   name: 'view',
-  //   message: 'What view layer do you want to use?',
-  //   choices: ['React', 'Snabbdom']
-  // }, {
-  //   type: 'list',
-  //   name: 'model',
-  //   message: 'What model layer you want to use?',
-  //   choices: ['Cerebral Model Immutable', 'Cerebral Model (mutable)']
-  // }]).then(function (answers) {
-  // })
+    fs.copySync(`${cliDirectory}/scaffold/${currentView.toLowerCase()}/webpack.config.js`, `${CWD}/${appName}/webpack.config.js`)
+    fs.copySync(`${cliDirectory}/scaffold/${currentView.toLowerCase()}/package.json`, `${CWD}/${appName}/package.json`)
+    fs.copySync(`${cliDirectory}/scaffold/${currentView.toLowerCase()}/build`, `${CWD}/${appName}/build`)
+
+    fs.copySync(`${cliDirectory}/scaffold/shared/index.html`, `${CWD}/${appName}/index.html`)
+    fs.copySync(`${cliDirectory}/scaffold/shared`, `${CWD}/${appName}/src`)
+    fs.removeSync(`${CWD}/${appName}/src/index.html`)
+
+    writeModules()
+
+    var modelFile = fs.readFileSync(`${cliDirectory}/scaffold/shared/model.js`, 'utf8')
+
+    // write selected model import statement
+    model = modelFile.replace('{{MODEL}}', `\'${PACKAGES[currentModel]}\'`)
+    fs.writeFileSync(`${CWD}/${appName}/src/model.js`, model)
+
+    // log scaffolded project directory
+    stdout = exec(`find ${appName} -type d -print`, {stdio: [0]})
+    console.log(`${stdout.toString()}`)
+
+    process.chdir(appName)
+
+    stdout = exec('git init', {stdio: [0]})
+    console.log(`* ${stdout.toString()}`)
+
+    pkg.name = dasherize(appName)
+
+    var modulePkgs = currentModules.map(function(moduleName) {
+      return httpGet('registry.npmjs.org', `/${PACKAGES.modules[moduleName]}`)
+    })
+
+    Promise.all([
+      httpGet('registry.npmjs.org', `/${PACKAGES[currentView]}`),
+      httpGet('registry.npmjs.org', `/${PACKAGES[currentModel]}`)
+    ].concat(modulePkgs))
+    .then(writeLatestPackages)
+    .then(function () {
+      var npm = spawn('npm', ['install'], {stdio: 'inherit'})
+      console.log('* installing npm packages...\n')
+
+      npm.on('close', function (code) {
+        console.log('* All npm packages successfully installed!')
+        console.log(`\n---------------------------------------------------------------------------`)
+        console.log(`\n* SUCCESS: New application '${appName}' created at '${CWD}'.\n`)
+      })
+    })
+
+    function writeLatestPackages (pkgs) {
+      pkgs.forEach(function (npmPackage) {
+        pkg.dependencies[npmPackage.name] = npmPackage['dist-tags'].latest
+      })
+      const data = fs.writeFileSync(
+        `${CWD}/${appName}/package.json`, JSON.stringify(pkg, null, 2)
+      )
+      return Promise.resolve(data)
+    }
+
+    function writeModules() {
+      var controllerFile = fs.readFileSync(`${cliDirectory}/scaffold/shared/controller.js`, 'utf8')
+
+      var generatedText = currentModules.reduce(function(text, moduleName) {
+        var importName =
+        `import ${moduleName} from '${PACKAGES.modules[moduleName]}'
+        {{MODULE_IMPORTS}}`
+
+        return text.replace('{{MODULE_IMPORTS}}', importName)
+      }, controllerFile)
+
+      var controllerFileText = generatedText.replace('{{MODULE_IMPORTS}}', '')
+
+      var generated = currentModules.reduce(function(text, moduleName) {
+        var importName =
+        `${moduleName.toLowerCase()}: ${moduleName}()
+        {{MODULES}}`
+
+        return text.replace('{{MODULES}}', importName)
+      }, controllerFileText)
+
+      var controllerText = generated.replace('{{MODULES}}', '')
+      fs.writeFileSync(`${CWD}/${appName}/src/controller.js`, controllerText)
+    }
+  }
 }
