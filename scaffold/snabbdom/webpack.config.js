@@ -1,19 +1,22 @@
 module.exports = {
+  entry: "./src/main.js",
+  output: {
+    path: './build',
+    publicPath: '/build/',
+    filename: 'bundle.js'
+  },
   module: {
     loaders: [{
-      test: /\.css?$/,
-      loader: 'style!css?modules&localIdentName=[name]---[local]---[hash:base64:5]'
-    },
-    {
       test: /\.js?$/,
       exclude: /node_modules/,
-      loader: 'babel',
+      loader: 'babel-loader',
       query: {
-        "presets": ["es2015"],
-        "plugins": [
-          ["transform-react-jsx", { "pragma": "Component.DOM" }]
-        ]
+        "presets": ["es2015", "stage-0"],
+        "plugins": []
       }
     }]
+  },
+  externals: {
+    'snabbdom-jsx': 'snabbdom-jsx'
   }
 };
