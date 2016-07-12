@@ -2,10 +2,16 @@
 Command line tool for cerebral app development.
 
 ## Example usage
-- `cerebral new my-app` - scaffold new app
+- `cerebral new my-app`
+  1. creates a basic project directory at /my-app
+  2. initializes new git repository
+  3. installs npm dependencies
 
-- `cerebral serve` - serve app on localhost
+- `cd /my-app`
 
-- `cerebral build` - build for deployment
+- `npm start`
+  - runs a webpack-dev-server at localhost:3000
+  - reloads on file changes
 
-- `cerbral generate module navbar` - generate an in app module scaffold directory
+- `npm run build`
+  - outputs bundle to `/build/bundle.js`

@@ -1,35 +1,40 @@
-import React from 'react';
-import {Decorator as Cerebral} from 'cerebral-view-react';
+import React from 'react'
+import {connect} from 'cerebral-view-react'
 
-@Cerebral({
-  newItemValue: 'app.newItemValue',
-  items: 'app.items'
-})
-class App extends React.Component {
-  onChange(e) {
-    this.props.signals.app.newItemValueChanged({
-      value: e.target.value
-    });
-  }
-  onSubmit(e) {
-    e.preventDefault();
-    this.props.signals.app.newItemSubmitted();
-  }
-  render() {
-    const {newItemValue, items} = this.props;
+export default connect({
+  newItemTitle: 'newItemTitle',
+  items: 'items'
+},
+  function App(props) {
+
+    const onFormSubmit = event => {
+      event.preventDefault()
+      props.signals.newItemTitleSubmitted()
+    }
+
+    const onInputChange = event => {
+      props.signals.newItemTitleChanged({
+        title: event.target.value
+      })
+    }
 
     return (
       <div>
-        <h1>Demo APP</h1>
-        <form onSubmit={e => this.onSubmit(e)}>
-          <input type="text" value={newItemValue} onChange={e => this.onChange(e)}/>
+        <form onSubmit={onFormSubmit}>
+          <input
+            type="text"
+            value={props.newItemTitle}
+            onChange={onInputChange}
+          />
         </form>
         <ul>
-          {items.map((item, index) => <li key={index}>{item}</li>)}
+          {props.items.map((item, index) => (
+            <li key={index}>
+              {item}
+            </li>
+          ))}
         </ul>
       </div>
-    );
+    )
   }
-}
-
-export default App;
+)

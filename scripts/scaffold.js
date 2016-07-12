@@ -153,7 +153,7 @@ module.exports = function scaffold (options) {
     })
 
     Promise.all([
-      httpGet('registry.npmjs.org', `/${PACKAGES[currentView]}`),
+      // httpGet('registry.npmjs.org', `/${PACKAGES[currentView]}`),
       httpGet('registry.npmjs.org', `/${PACKAGES[currentModel]}`)
     ].concat(modulePkgs))
     .then(writeLatestPackages)
@@ -183,8 +183,8 @@ module.exports = function scaffold (options) {
 
       var generatedText = currentModules.reduce(function(text, moduleName) {
         var importName =
-        `import ${moduleName} from '${PACKAGES.modules[moduleName]}'
-        {{MODULE_IMPORTS}}`
+`import ${moduleName} from '${PACKAGES.modules[moduleName]}'
+{{MODULE_IMPORTS}}`
 
         return text.replace('{{MODULE_IMPORTS}}', importName)
       }, controllerFile)
@@ -193,8 +193,8 @@ module.exports = function scaffold (options) {
 
       var generated = currentModules.reduce(function(text, moduleName) {
         var importName =
-        `${moduleName.toLowerCase()}: ${moduleName}()
-        {{MODULES}}`
+  `${moduleName.toLowerCase()}: ${moduleName}(),
+  {{MODULES}}`
 
         return text.replace('{{MODULES}}', importName)
       }, controllerFileText)

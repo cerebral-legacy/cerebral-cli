@@ -16,11 +16,12 @@
     "url": ""
   },
   "scripts": {
-    "start": "",
-    "build": ""
+    "start": "webpack-dev-server --port 3000 --config webpack.config.js --watch --inline --colors --progress",
+    "build": "webpack --config webpack.config.js --progress --verbose"
   },
   "dependencies": {
-    "cerebral": "^0.34.0-rc.4",
+    "cerebral": "https://github.com/cerebral/cerebral.git#state-tree",
+    "cerebral-view-react": "https://github.com/cerebral/cerebral-view-react.git#state-tree",
     "react": "^15.0.1",
     "react-dom": "^15.0.1"
   },
