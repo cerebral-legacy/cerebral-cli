@@ -113,8 +113,8 @@ module.exports = function scaffold (options) {
 
     fs.mkdirsSync(`${CWD}/${appName}`)
 
-    var stdout = exec('npm root -g', {stdio: [0]})
-    var cliDirectory = `${stdout.toString().split('\n')[0]}/cerebral-cli`
+    var stdout = exec('npm prefix -g', {stdio: [0]})
+    var cliDirectory = `${stdout.toString().split('\n')[0]}/lib/node_modules/cerebral-cli`
 
     console.log(`\n* Scaffolding new Cerebral application with: ${currentView}, ${currentModel}, ${currentModules.join(', ')}:\n`)
 
