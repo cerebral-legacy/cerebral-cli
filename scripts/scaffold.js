@@ -41,7 +41,7 @@ module.exports = function scaffold (options) {
       type: 'list',
       name: 'view',
       message: 'View package:',
-      choices: ['React', 'Snabbdom']
+      choices: ['React', 'Snabbdom', 'Inferno']
     }])
     .then(function (answers) {
       currentView = answers.view
@@ -96,6 +96,7 @@ module.exports = function scaffold (options) {
       // Views
       'React': 'cerebral-view-react',
       'Snabbdom': 'cerebral-view-snabbdom',
+      'Inferno': 'cerebral-view-inferno',
       // Models
       'Immutable': 'cerebral-model-immutable',
       'Mutable': 'cerebral-model',
