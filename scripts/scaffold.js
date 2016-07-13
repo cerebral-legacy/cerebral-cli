@@ -18,21 +18,20 @@ module.exports = function scaffold (options) {
       message: 'Project configuration: ',
       choices: [
         new inquirer.Separator(),
-        'Default',
+        'Create project',
         new inquirer.Separator(),
         'Change view: (' + currentView + ')',
         'Change model: (' + currentModel + ')',
-        'Change modules: (' + currentModules + ')',
-        'Done'
+        'Change modules: (' + currentModules + ')'
       ]
     }])
     .then(function (answers) {
+      if (answers.main.indexOf('Create project') === 0 || answers.main.indexOf('Default') === 0) {
+        scaffold()
+      }
       if (answers.main.indexOf('Change view') === 0) { view() }
       if (answers.main.indexOf('Change model') === 0) { model() }
       if (answers.main.indexOf('Change modules') === 0) { modules() }
-      if (answers.main.indexOf('Done') === 0 || answers.main.indexOf('Default') === 0) {
-        scaffold()
-      }
     })
   }
 
@@ -124,7 +123,6 @@ module.exports = function scaffold (options) {
 
     fs.copySync(`${cliDirectory}/scaffold/${currentView.toLowerCase()}/webpack.config.js`, `${CWD}/${appName}/webpack.config.js`)
     fs.copySync(`${cliDirectory}/scaffold/${currentView.toLowerCase()}/package.json`, `${CWD}/${appName}/package.json`)
-    fs.copySync(`${cliDirectory}/scaffold/${currentView.toLowerCase()}/build`, `${CWD}/${appName}/build`)
 
     fs.copySync(`${cliDirectory}/scaffold/shared/index.html`, `${CWD}/${appName}/index.html`)
     fs.copySync(`${cliDirectory}/scaffold/shared`, `${CWD}/${appName}/src`)
@@ -165,7 +163,10 @@ module.exports = function scaffold (options) {
       npm.on('close', function (code) {
         console.log('* All npm packages successfully installed!')
         console.log(`\n---------------------------------------------------------------------------`)
-        console.log(`\n* SUCCESS: New application '${appName}' created at '${CWD}'.\n`)
+        console.log(`\n* SUCCESS: New application '${appName}' created at '${CWD}'`)
+        console.log('\n1. Go to project directory')
+        console.log('\n2. Run \'npm start\'')
+        console.log('\n3. Go to \'localhost:3000\' in your browser')
       })
     })
 
