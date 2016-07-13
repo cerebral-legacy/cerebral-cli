@@ -16,7 +16,7 @@
     "url": ""
   },
   "scripts": {
-    "start": "webpack-dev-server --port 3000 --config webpack.config.js --watch --inline --colors --progress",
+    "start": "webpack-dev-server",
     "build": "webpack --config webpack.config.js --progress --verbose"
   },
   "dependencies": {
