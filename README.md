@@ -2,7 +2,7 @@
 Command line tool for bootstrapping cerebral app development.
 
 ## Install
-`npm install cerebral-cli` - makes the `cerebral` command available
+`npm install cerebral-cli -g` - makes the `cerebral` command available globally
 
 ## Example usage
 
