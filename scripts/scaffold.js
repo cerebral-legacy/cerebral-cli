@@ -40,7 +40,7 @@ module.exports = function scaffold (options) {
       type: 'list',
       name: 'view',
       message: 'View package:',
-      choices: ['React', 'Snabbdom', 'Inferno']
+      choices: ['React', 'Snabbdom', 'Inferno', 'None']
     }])
     .then(function (answers) {
       currentView = answers.view
@@ -96,9 +96,6 @@ module.exports = function scaffold (options) {
       'React': 'cerebral-view-react',
       'Snabbdom': 'cerebral-view-snabbdom',
       'Inferno': 'cerebral-view-inferno',
-      // Models
-      'Immutable': 'cerebral-model-immutable',
-      'Mutable': 'cerebral-model',
       // Modules
       modules: {
         'Devtools': 'cerebral-module-devtools',
@@ -133,7 +130,7 @@ module.exports = function scaffold (options) {
     var modelFile = fs.readFileSync(`${cliDirectory}/scaffold/shared/model.js`, 'utf8')
 
     // write selected model import statement
-    model = modelFile.replace('{{MODEL}}', `\'${PACKAGES[currentModel]}\'`)
+    model = modelFile.replace('{{MODEL}}', `\'cerebral/models/${currentModel.toLowerCase()}\'`)
     fs.writeFileSync(`${CWD}/${appName}/src/model.js`, model)
 
     // log scaffolded project directory
