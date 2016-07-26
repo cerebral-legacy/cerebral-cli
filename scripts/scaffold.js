@@ -144,28 +144,31 @@ module.exports = function scaffold (options) {
       return httpGet('registry.npmjs.org', `/${PACKAGES.modules[moduleName]}`)
     })
 
-    Promise.all([
-      // httpGet('registry.npmjs.org', `/${PACKAGES[currentView]}`),
-      httpGet('registry.npmjs.org', `/${PACKAGES[currentModel]}`)
-    ].concat(modulePkgs))
-    .then(writeLatestPackages)
-    .then(function () {
-      var npm = spawn('npm', ['install'], {stdio: 'inherit'})
-      console.log('* installing npm packages...\n')
+    if (currentView !== 'None') {
+      modulePkgs.concat(httpGet('registry.npmjs.org', `/${PACKAGES[currentView]}`))
+    }
 
-      npm.on('error', function (e) {
-        console.log(e)
-      })
+    modulePkgs.concat(httpGet('registry.npmjs.org', `/${PACKAGES[currentModel]}`))
 
-      npm.on('close', function (code) {
-        console.log('* All npm packages successfully installed!')
-        console.log(`\n---------------------------------------------------------------------------`)
-        console.log(`\n* SUCCESS: New application '${appName}' created at '${CWD}'`)
-        console.log('\n1. Go to project directory')
-        console.log('\n2. Run \'npm start\'')
-        console.log('\n3. Go to \'localhost:3000\' in your browser')
+    Promise.all(modulePkgs)
+      .then(writeLatestPackages)
+      .then(function () {
+        var npm = spawn('npm', ['install'], {stdio: 'inherit'})
+        console.log('* installing npm packages...\n')
+
+        npm.on('error', function (e) {
+          console.log(e)
+        })
+
+        npm.on('close', function (code) {
+          console.log('* All npm packages successfully installed!')
+          console.log(`\n---------------------------------------------------------------------------`)
+          console.log(`\n* SUCCESS: New application '${appName}' created at '${CWD}'`)
+          console.log('\n1. Go to project directory')
+          console.log('\n2. Run \'npm start\'')
+          console.log('\n3. Go to \'localhost:3000\' in your browser')
+        })
       })
-    })
 
     function writeLatestPackages (pkgs) {
       pkgs.forEach(function (npmPackage) {
