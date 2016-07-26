@@ -133,10 +133,6 @@ module.exports = function scaffold (options) {
     model = modelFile.replace('{{MODEL}}', `\'cerebral/models/${currentModel.toLowerCase()}\'`)
     fs.writeFileSync(`${CWD}/${appName}/src/model.js`, model)
 
-    // log scaffolded project directory
-    stdout = exec(`find ${appName} -type d -print`, {stdio: [0]})
-    console.log(`${stdout.toString()}`)
-
     process.chdir(appName)
 
     stdout = exec('git init', {stdio: [0]})
