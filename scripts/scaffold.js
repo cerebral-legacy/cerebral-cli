@@ -1,7 +1,8 @@
+const path = require('path')
 const fs = require('fs-extra')
 const CWD = process.cwd()
 var exec = require('child_process').execSync
-var spawn = require('child_process').spawn
+var spawn = require('cross-spawn')
 var inquirer = require('inquirer')
 var httpGet = require('./utils').httpGet
 var dasherize = require('./utils').dasherize
@@ -109,8 +110,7 @@ module.exports = function scaffold (options) {
 
     fs.mkdirsSync(`${CWD}/${appName}`)
 
-    var stdout = exec('npm prefix -g', {stdio: [0]})
-    var cliDirectory = `${stdout.toString().split('\n')[0]}/lib/node_modules/cerebral-cli`
+    var cliDirectory = path.resolve(__dirname, '../')
 
     console.log(`\n* Scaffolding new Cerebral application with: ${currentView}, ${currentModel}, ${currentModules.join(', ')}:\n`)
 
@@ -133,10 +133,6 @@ module.exports = function scaffold (options) {
     model = modelFile.replace('{{MODEL}}', `\'cerebral/models/${currentModel.toLowerCase()}\'`)
     fs.writeFileSync(`${CWD}/${appName}/src/model.js`, model)
 
-    // log scaffolded project directory
-    stdout = exec(`find ${appName} -type d -print`, {stdio: [0]})
-    console.log(`${stdout.toString()}`)
-
     process.chdir(appName)
 
     stdout = exec('git init', {stdio: [0]})
@@ -148,24 +144,31 @@ module.exports = function scaffold (options) {
       return httpGet('registry.npmjs.org', `/${PACKAGES.modules[moduleName]}`)
     })
 
-    Promise.all([
-      // httpGet('registry.npmjs.org', `/${PACKAGES[currentView]}`),
-      httpGet('registry.npmjs.org', `/${PACKAGES[currentModel]}`)
-    ].concat(modulePkgs))
-    .then(writeLatestPackages)
-    .then(function () {
-      var npm = spawn('npm', ['install'], {stdio: 'inherit'})
-      console.log('* installing npm packages...\n')
+    if (currentView !== 'None') {
+      modulePkgs.concat(httpGet('registry.npmjs.org', `/${PACKAGES[currentView]}`))
+    }
 
-      npm.on('close', function (code) {
-        console.log('* All npm packages successfully installed!')
-        console.log(`\n---------------------------------------------------------------------------`)
-        console.log(`\n* SUCCESS: New application '${appName}' created at '${CWD}'`)
-        console.log('\n1. Go to project directory')
-        console.log('\n2. Run \'npm start\'')
-        console.log('\n3. Go to \'localhost:3000\' in your browser')
+    modulePkgs.concat(httpGet('registry.npmjs.org', `/${PACKAGES[currentModel]}`))
+
+    Promise.all(modulePkgs)
+      .then(writeLatestPackages)
+      .then(function () {
+        var npm = spawn('npm', ['install'], {stdio: 'inherit'})
+        console.log('* installing npm packages...\n')
+
+        npm.on('error', function (e) {
+          console.log(e)
+        })
+
+        npm.on('close', function (code) {
+          console.log('* All npm packages successfully installed!')
+          console.log(`\n---------------------------------------------------------------------------`)
+          console.log(`\n* SUCCESS: New application '${appName}' created at '${CWD}'`)
+          console.log('\n1. Go to project directory')
+          console.log('\n2. Run \'npm start\'')
+          console.log('\n3. Go to \'localhost:3000\' in your browser')
+        })
       })
-    })
 
     function writeLatestPackages (pkgs) {
       pkgs.forEach(function (npmPackage) {
