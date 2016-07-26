@@ -2,7 +2,7 @@ const path = require('path')
 const fs = require('fs-extra')
 const CWD = process.cwd()
 var exec = require('child_process').execSync
-var spawn = require('child_process').spawn
+var spawn = require('cross-spawn')
 var inquirer = require('inquirer')
 var httpGet = require('./utils').httpGet
 var dasherize = require('./utils').dasherize
@@ -152,6 +152,10 @@ module.exports = function scaffold (options) {
     .then(function () {
       var npm = spawn('npm', ['install'], {stdio: 'inherit'})
       console.log('* installing npm packages...\n')
+
+      npm.on('error', function (e) {
+        console.log(e)
+      })
 
       npm.on('close', function (code) {
         console.log('* All npm packages successfully installed!')
