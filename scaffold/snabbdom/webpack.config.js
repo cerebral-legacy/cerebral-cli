@@ -1,8 +1,22 @@
+const webpack = require('webpack');
+const path = require('path');
+const plugins = [
+  new webpack.DefinePlugin({
+    'process.env': {
+      'NODE_ENV': JSON.stringify(process.env.NODE_ENV || 'development')
+    }
+  })
+];
+
+if (process.env.NODE_ENV === 'production') {
+  plugins.push(new webpack.optimize.UglifyJsPlugin({ compress: { warnings: false } }));
+}
+
 module.exports = {
-  entry: "./src/main.js",
+  entry: path.resolve('src', 'main.js'),
   output: {
-    path: './build',
-    publicPath: '/build/',
+    path: path.resolve('build'),
+    publicPath: '/build',
     filename: 'bundle.js'
   },
   devServer: {
@@ -12,14 +26,11 @@ module.exports = {
     loaders: [{
       test: /\.js?$/,
       exclude: /node_modules/,
-      loader: 'babel-loader',
+      loader: 'babel',
       query: {
-        "presets": ["es2015", "stage-0"],
-        "plugins": []
+        presets: ['es2015', 'stage-0']
       }
     }]
   },
-  externals: {
-    'snabbdom-jsx': 'snabbdom-jsx'
-  }
+  plugins: plugins
 };

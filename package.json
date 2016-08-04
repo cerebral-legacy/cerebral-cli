@@ -1,6 +1,6 @@
 {
   "name": "cerebral-cli",
-  "version": "0.0.15",
+  "version": "0.0.16",
   "description": "Command line tool for bootstrapping cerebral app development.",
   "preferGlobal": true,
   "bin": {
