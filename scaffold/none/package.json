@@ -20,7 +20,7 @@
     "build": "webpack --config webpack.config.js --progress --verbose"
   },
   "dependencies": {
-    "cerebral": "^0.35.x",
+    "cerebral": "^0.35.x"
   },
   "devDependencies": {
     "babel-core": "^6.7.x",
