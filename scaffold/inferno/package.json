@@ -20,7 +20,7 @@
     "build": "webpack --config webpack.config.js --progress --verbose"
   },
   "dependencies": {
-    "cerebral": "^0.35.x",
+    "cerebral": "^1.0.0",
     "cerebral-view-inferno": "^1.0.x"
   },
   "devDependencies": {
