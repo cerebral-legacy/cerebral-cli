@@ -5,11 +5,11 @@ describe('Chain: newItemTitleChanged', () => {
   let controller, signals;
 
   beforeEach(() => {
-    [controller, signals] = Controller({
+    ({controller, signals} = Controller({
       // state
     }, {
       // module: Module()
-    })
+    }))
     controller.addSignals({
       newItemTitleChanged: {
         chain: updateItemTitle,
