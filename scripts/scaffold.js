@@ -6,6 +6,7 @@ var spawn = require('cross-spawn')
 var inquirer = require('inquirer')
 var httpGet = require('./utils').httpGet
 var dasherize = require('./utils').dasherize
+var merge = require('./utils').merge
 
 module.exports = function scaffold (options) {
   var currentView = 'React';
@@ -112,6 +113,66 @@ module.exports = function scaffold (options) {
 
     var cliDirectory = path.resolve(__dirname, '../')
 
+    if (options.testing) {
+      var scripts = {
+        "start": "webpack-dev-server",
+        "build": "webpack --config webpack.config.js --progress --verbose",
+        "check-outdated": "node_modules/.bin/npm-check -s --no-emoji",
+        "update-packages": "node_modules/.bin/npm-check -u",
+        "test": "NODE_ENV=test node_modules/.bin/karma start karma.config.js --coverage",
+        "test:watch": "NODE_ENV=test node_modules/.bin/karma start karma.config.js --watch",
+        "test:debug": "NODE_ENV=test node_modules/.bin/karma start karma.config.js --debug",
+        "test:chrome": "NODE_ENV=test node_modules/.bin/karma start karma.config.js --chrome --watch"
+      }
+      var devDependencies = {
+        "babel-plugin-__coverage__": "^11.0.x",
+        "babel-polyfill": "^6.13.x",
+        "cerebral-testable": "^1.1.x",
+        "chai": "^3.5.x",
+        "karma": "^1.1.x",
+        "karma-chai": "^0.1.x",
+        "karma-chrome-launcher": "^1.0.x",
+        "karma-coverage": "^1.1.x",
+        "karma-mocha": "^1.1.x",
+        "karma-phantomjs-launcher": "^1.0.x",
+        "karma-sourcemap-loader": "^0.3.x",
+        "karma-spec-reporter": "^0.0.x",
+        "karma-threshold-reporter": "^0.1.x",
+        "karma-webpack": "^1.7.x",
+        "mocha": "^3.0.x",
+        "npm-check": "^5.2.x",
+        "phantomjs-prebuilt": "^2.1.x",
+        "sinon": "^1.17.x",
+        "yargs": "^4.8.x"
+      }
+      var reactDevDependencies = {
+        "chai-enzyme": "^0.5.x",
+        "enzyme": "^2.4.x",
+        "react-addons-test-utils": "^15.3.x"
+      }
+
+      fs.mkdirsSync(`${CWD}/${appName}/src/test`)
+      fs.mkdirsSync(`${CWD}/${appName}/src/test/components`)
+      fs.mkdirsSync(`${CWD}/${appName}/src/test/computed`)
+      fs.mkdirsSync(`${CWD}/${appName}/src/test/chains`)
+
+      var karmaConfig = (currentView === 'React')
+        ? `${cliDirectory}/scaffold/testing/karma.config.react.js`
+        : `${cliDirectory}/scaffold/testing/karma.config.js`
+
+      fs.copySync(karmaConfig, `${CWD}/${appName}/karma.config.js`)
+
+      pkg.scripts = scripts
+      merge(pkg.devDependencies, devDependencies)
+
+      if (currentView === 'React') merge(pkg.devDependencies, reactDevDependencies)
+
+      fs.writeFileSync(`${CWD}/${appName}/package.json`, JSON.stringify(pkg, null, 2))
+
+      fs.copySync(`${cliDirectory}/scaffold/testing/newItemTitleChangedTest.js`,
+        `${CWD}/${appName}/test/chains/newItemTitleChangedTest.js`)
+    }
+
     console.log(`\n* Scaffolding new Cerebral application with: ${currentView}, ${currentModel}, ${currentModules.join(', ')}:\n`)
 
     // copy scaffold files
@@ -205,4 +266,5 @@ module.exports = function scaffold (options) {
       fs.writeFileSync(`${CWD}/${appName}/src/controller.js`, controllerText)
     }
   }
+
 }

@@ -33,6 +33,7 @@ Object.keys(COMMANDS).forEach(command => {
 
 argv
   .example('cerebral-cli new my-app', 'Create new-app dir with project files.')
+  .describe('testing', 'include testing directory and packages')
 
 argv
   .version(pkg.version)
@@ -44,7 +45,8 @@ argv
 const ARGV = argv.argv
 const command = ARGV._[0]
 const options = {
-  appName: ARGV._[1]
+  appName: ARGV._[1],
+  testing: yargs.argv.testing
 }
 
 tasks[command](options)

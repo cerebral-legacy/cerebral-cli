@@ -18,7 +18,15 @@ function dasherize (string) {
   })
 }
 
+function merge(target, object) {
+  Object.keys(object).forEach(function(key) {
+    target[key] = object[key];
+  })
+  return target;
+}
+
 module.exports = {
   httpGet,
-  dasherize
+  dasherize,
+  merge
 }
